@@ -1,0 +1,49 @@
+# ==============================================================
+# Face Recognition Attendance System - Dependencies
+# Python 3.11.x required (see README.md for details)
+# ==============================================================
+
+# --- Web Framework ---
+fastapi==0.111.1
+uvicorn[standard]==0.30.1
+jinja2==3.1.4
+python-multipart==0.0.9
+aiofiles==23.2.1
+
+# --- Configuration & Environment ---
+python-dotenv==1.0.1
+pydantic==2.7.4
+pydantic-settings==2.3.4
+
+# --- Database ---
+sqlalchemy==2.0.31
+asyncpg==0.29.0
+alembic==1.13.2
+
+# --- Computer Vision ---
+opencv-python==4.10.0.84
+numpy==1.26.4
+Pillow==10.4.0
+
+# --- Face Recognition ---
+# InsightFace uses ONNX Runtime under the hood.
+# For CPU-only machines: onnxruntime is used below.
+# For NVIDIA GPU (like MX450): replace onnxruntime with onnxruntime-gpu
+# and make sure CUDA 11.8 or 12.x is installed.
+insightface==0.7.3
+onnxruntime==1.18.0
+# scipy must be pinned to <1.12 — scipy>=1.13 requires numpy>=2.0
+# which is incompatible with insightface 0.7.3 (compiled against numpy 1.x)
+scipy==1.11.4
+
+# --- Utilities ---
+httpx==0.27.0
+python-jose[cryptography]==3.3.0
+
+# ==============================================================
+# GPU NOTE:
+# If you have an NVIDIA GPU with CUDA support, run:
+#   pip uninstall onnxruntime
+#   pip install onnxruntime-gpu==1.18.0
+# Make sure CUDA 11.8 or 12.x is installed on your system.
+# ==============================================================

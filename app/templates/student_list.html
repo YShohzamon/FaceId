@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Students — FaceID Attendance{% endblock %}
+{% block page_title %}Student List{% endblock %}
+
+{% block content %}
+<div class="page-toolbar">
+    <div class="search-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Search students..." class="search-input" />
+    </div>
+    <a href="{{ url_for('add_student_page') }}" class="btn btn--primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Add Student
+    </a>
+</div>
+
+<div class="section-card">
+    {% if students %}
+    <div class="table-wrapper">
+        <table class="data-table" id="studentsTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Student ID</th>
+                    <th>Enrolled</th>
+                    <th>Faces</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.id }}</td>
+                    <td class="student-name-cell">
+                        <div class="student-avatar">{{ student.name[0].upper() }}</div>
+                        {{ student.name }}
+                    </td>
+                    <td>{{ student.student_code or '—' }}</td>
+                    <td>{{ student.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        <span class="badge">{{ student.face_embeddings | length }} images</span>
+                    </td>
+                    <td>
+                        {% if student.is_active %}
+                        <span class="status-badge status-badge--on">Active</span>
+                        {% else %}
+                        <span class="status-badge status-badge--off">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td class="actions-cell">
+                        <button
+                            class="btn-icon btn-icon--danger"
+                            title="Delete student"
+                            onclick="deleteStudent({{ student.id }}, '{{ student.name }}')"
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3,6 5,6 21,6"/>
+                                <path d="M19 6l-1 14H6L5 6"/>
+                                <path d="M10 11v6m4-6v6"/>
+                                <path d="M9 6V4h6v2"/>
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <p class="table-footer">Total: <strong>{{ students | length }}</strong> students</p>
+
+    {% else %}
+    <div class="empty-state">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <p>No students registered yet.</p>
+        <a href="{{ url_for('add_student_page') }}" class="btn btn--primary">Add First Student</a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-overlay" id="deleteModal" style="display:none;">
+    <div class="modal">
+        <h3 class="modal-title">Delete Student</h3>
+        <p class="modal-body">Are you sure you want to delete <strong id="deleteStudentName"></strong>?
+        This will remove all their face data and attendance records.</p>
+        <div class="modal-actions">
+            <button class="btn btn--danger" id="confirmDeleteBtn">Delete</button>
+            <button class="btn btn--ghost" onclick="closeDeleteModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', path='js/students.js') }}"></script>
+{% endblock %}
