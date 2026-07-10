@@ -33,13 +33,13 @@ async def save_face_image_record(
     angle_label: str,
 ) -> FaceEmbedding:
     """
-    Save a face image record to DB (embedding_path is empty for now —
-    it will be filled in Phase 6 when we generate the actual embedding).
+    Save a face image record. embedding_path stays empty until
+    POST /api/enroll/generate/{id} creates the .npy file.
     """
     record = FaceEmbedding(
         student_id=student_id,
         image_path=image_path,
-        embedding_path="",   # Filled in Phase 6
+        embedding_path="",
         angle_label=angle_label,
     )
     db.add(record)

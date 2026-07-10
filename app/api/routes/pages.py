@@ -14,7 +14,6 @@ from app.database.connection import get_db
 from app.models.student import Student
 from app.models.attendance_log import AttendanceLog
 from app.core.config import settings
-from app.core.network import get_wifi_ipv4_addresses
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -144,16 +143,12 @@ async def attendance_page(request: Request, db: AsyncSession = Depends(get_db)):
 
 @router.get("/settings", response_class=HTMLResponse, name="settings_page")
 async def settings_page(request: Request):
-    """Settings page (placeholder)."""
-    lan_ips = get_wifi_ipv4_addresses()
-    phone_urls = [f"http://{ip}:8000" for ip in lan_ips]
+    """Settings page — read-only display of values from .env."""
     return templates.TemplateResponse(
         "settings.html",
         {
             "request": request,
             "active_page": "settings",
             "config": settings,
-            "lan_ips": lan_ips,
-            "phone_urls": phone_urls,
         },
     )

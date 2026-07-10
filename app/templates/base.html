@@ -2,9 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}FaceID Attendance{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', path='css/main.css') }}" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -12,9 +10,6 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body class="{% if active_page %}page-{{ active_page }}{% endif %}">
-
-<!-- Mobile menu overlay -->
-<div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <!-- Sidebar -->
 <aside class="sidebar" id="sidebar">
@@ -94,13 +89,6 @@
 <main class="main-content">
     <header class="top-bar">
         <div class="top-bar-left">
-            <button class="menu-toggle" id="menuToggle" aria-label="Open menu">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="3" y1="6" x2="21" y2="6"/>
-                    <line x1="3" y1="12" x2="21" y2="12"/>
-                    <line x1="3" y1="18" x2="21" y2="18"/>
-                </svg>
-            </button>
             <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
         </div>
         <div class="top-bar-right">
@@ -114,49 +102,6 @@
         {% block content %}{% endblock %}
     </div>
 </main>
-
-<!-- Mobile bottom navigation -->
-<nav class="mobile-bottom-nav" id="mobileBottomNav">
-    <a href="{{ url_for('home') }}" class="mobile-nav-item {% if active_page == 'home' %}active{% endif %}">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            <polyline points="9,22 9,12 15,12 15,22"/>
-        </svg>
-        <span>Home</span>
-    </a>
-    <a href="{{ url_for('recognition_page') }}" class="mobile-nav-item {% if active_page == 'recognition' %}active{% endif %}">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="2" y="3" width="20" height="14" rx="2"/>
-            <circle cx="12" cy="10" r="3"/>
-        </svg>
-        <span>Scan</span>
-    </a>
-    <a href="{{ url_for('add_student_page') }}" class="mobile-nav-item {% if active_page == 'add_student' %}active{% endif %}">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-            <circle cx="9" cy="7" r="4"/>
-            <line x1="19" y1="8" x2="19" y2="14"/>
-            <line x1="22" y1="11" x2="16" y2="11"/>
-        </svg>
-        <span>Add</span>
-    </a>
-    <a href="{{ url_for('student_list_page') }}" class="mobile-nav-item {% if active_page == 'students' %}active{% endif %}">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-            <circle cx="9" cy="7" r="4"/>
-        </svg>
-        <span>Students</span>
-    </a>
-    <a href="{{ url_for('attendance_page') }}" class="mobile-nav-item {% if active_page == 'attendance' %}active{% endif %}">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="4" width="18" height="18" rx="2"/>
-            <line x1="16" y1="2" x2="16" y2="6"/>
-            <line x1="8" y1="2" x2="8" y2="6"/>
-            <line x1="3" y1="10" x2="21" y2="10"/>
-        </svg>
-        <span>Log</span>
-    </a>
-</nav>
 
 <!-- Toast notifications container -->
 <div id="toast-container" class="toast-container"></div>

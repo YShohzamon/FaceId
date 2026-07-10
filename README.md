@@ -1,61 +1,145 @@
+<div align="center">
+
 # FaceID Attendance
 
-**Real-time face recognition attendance system** — webcam orqali talabalarni aniqlaydi, ismini ko'rsatadi va davomatni avtomatik yozadi.
+**Real-time yuz tanish orqali aqlli davomat tizimi**
 
-Python · FastAPI · InsightFace · PostgreSQL · OpenCV
+Veb-kamera yordamida talabalarni aniqlaydi, ismini ko'rsatadi va davomatni avtomatik yozadi.
+
+<br/>
+
+![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+![OpenCV](https://img.shields.io/badge/OpenCV-5C3EE8?style=for-the-badge&logo=opencv&logoColor=white)
+![InsightFace](https://img.shields.io/badge/InsightFace-ArcFace-FF6B35?style=for-the-badge)
+
+<br/>
+
+[Tizim ko'rinishi](#-tizim-ko'rinishi) ·
+[Imkoniyatlar](#-imkoniyatlar) ·
+[Tez boshlash](#-tez-boshlash) ·
+[Sozlamalar](#%EF%B8%8F-sozlamalar) ·
+[API](#-api-endpointlar)
+
+</div>
 
 ---
 
-## Imkoniyatlar
+## 📸 Tizim ko'rinishi
 
-| Funksiya | Tavsif |
-|----------|--------|
-| **Jonli tanish** | Veb-kamera orqali real vaqtda yuz aniqlash va talabani tanish |
-| **Davomat yozish** | Tanilgan talaba uchun avtomatik davomat + cooldown himoyasi |
-| **Talaba qo'shish** | 5 burchakdan yuz surati (kamera yoki fayl orqali) |
-| **Embedding** | ArcFace modeli bilan 512-o'lchamli yuz vektori |
-| **Dashboard** | Statistika, talabalar ro'yxati, davomat tarixi |
-| **Mobil qo'llab-quvvatlash** | Telefondan Wi-Fi orqali kirish, responsive UI |
-| **GPU / CPU** | NVIDIA GPU (CUDA) yoki CPU rejimi |
+FaceID Attendance zamonaviy **qorong'u mavzu** (dark theme) bilan ishlaydigan veb-interfeysga ega. Chap tomonda doimiy navigatsiya paneli, o'ng tomonda esa asosiy kontent joylashgan. Barcha sahifalar bir xil dizayn tizimida — toza, professional va foydalanish uchun qulay.
+
+### Asosiy ekran — Dashboard
+
+Bosh sahifada tizim holati bir nazar ko'rinadi: jami talabalar soni, bugungi davomat, tanish tizimi holati va umumiy yozuvlar. Tez harakatlar tugmalari orqali jonli tanishni boshlash, yangi talaba qo'shish yoki ro'yxatni ko'rish mumkin. Pastki qismda oxirgi davomat jadvali — talaba ismi, sana, vaqt va ishonch foizi ko'rsatiladi.
+
+![FaceID Dashboard — statistika kartalari, tez harakatlar va oxirgi davomat jadvali](./interface_images/home.png)
 
 ---
 
-## Qanday ishlaydi
+### Jonli tanish — kamera kutish holati
+
+Live Recognition sahifasida markazda kamera oqimi, o'ng tomonda esa tanish natijasi va tizim holati paneli joylashgan. Kamera yoqilmaguncha qora ekran va "Press Start Camera to begin" yozuvi chiqadi. O'ng panelda kamera, AI model, tanish va GPU/CPU holati real vaqtda yangilanadi.
+
+![Jonli tanish — kamera yoqishdan oldin, tizim tayyor holatda](./interface_images/recognition.png)
+
+---
+
+### Jonli tanish — talaba aniqlangan
+
+Kamera yoqilgach, yuz atrofida **yashil ramka** paydo bo'ladi va talaba ismi bilan ishonch foizi (masalan, `Shohzamon 91%`) ko'rsatiladi. FPS hisoblagich o'ng yuqori burchakda, tanish natijasi va cooldown vaqti o'ng panelda aks etadi. Tanish muvaffaqiyatli bo'lganda davomat avtomatik yoziladi.
+
+![Jonli tanish — talaba tanilganda, yuz atrofida yashil ramka va ishonch foizi](./interface_images/live_recognition.png)
+
+---
+
+### Talabalar ro'yxati
+
+Barcha ro'yxatdan o'tgan talabalar jadval ko'rinishida: avatar, ism, talaba ID, ro'yxatdan o'tish sanasi, saqlangan yuz suratlari soni (5 ta) va holat (Active). Qidiruv maydoni va "+ Add Student" tugmasi yuqori qismda. Har bir talabani o'chirish imkoniyati ham mavjud.
+
+![Talabalar ro'yxati — qidiruv, avatar va holat boshqaruvi](./interface_images/students.png)
+
+---
+
+## ✨ Imkoniyatlar
+
+| | Funksiya | Tavsif |
+|:---:|:---|:---|
+| 🎥 | **Jonli tanish** | Veb-kamera orqali real vaqtda yuz aniqlash va talabani tanish |
+| ✅ | **Davomat yozish** | Tanilgan talaba uchun avtomatik davomat + cooldown himoyasi |
+| 👤 | **Talaba qo'shish** | 5 burchakdan yuz surati (kamera yoki fayl orqali) |
+| 🧠 | **Embedding** | ArcFace modeli bilan 512-o'lchamli yuz vektori |
+| 📊 | **Dashboard** | Statistika, talabalar ro'yxati, davomat tarixi |
+| ⚡ | **GPU / CPU** | NVIDIA GPU (CUDA) yoki CPU rejimi |
+
+---
+
+## ⚙️ Qanday ishlaydi
 
 ```
 Veb-kamera kadr
-      ↓
+      │
+      ▼
 Yuz aniqlash (SCRFD)
-      ↓
+      │
+      ▼
 Yuzni tekislash (5 nuqta landmark)
-      ↓
+      │
+      ▼
 Embedding (ArcFace → 512 vektor)
-      ↓
+      │
+      ▼
 Cosine similarity solishtirish
-      ↓
+      │
+      ▼
 Natija: Talaba ismi yoki "Stranger"
 ```
 
 ---
 
-## Texnologiyalar
+## 🛠 Texnologiyalar
 
-| Qatlam | Texnologiya |
-|--------|-------------|
-| Backend | Python 3.11, FastAPI, Uvicorn |
-| Frontend | HTML, CSS, JavaScript, Jinja2 |
-| Ma'lumotlar bazasi | PostgreSQL 14+ |
-| Yuz aniqlash | InsightFace SCRFD |
-| Yuz tanish | InsightFace ArcFace (buffalo_l) |
-| Inference | ONNX Runtime (CPU / GPU) |
-| Tasvir ishlash | OpenCV, Pillow |
-| ORM | SQLAlchemy 2.0 (async) + asyncpg |
+<table>
+  <tr>
+    <th>Qatlam</th>
+    <th>Texnologiya</th>
+  </tr>
+  <tr>
+    <td>Backend</td>
+    <td>Python 3.11 · FastAPI · Uvicorn</td>
+  </tr>
+  <tr>
+    <td>Frontend</td>
+    <td>HTML · CSS · JavaScript · Jinja2</td>
+  </tr>
+  <tr>
+    <td>Ma'lumotlar bazasi</td>
+    <td>PostgreSQL 14+ · SQLAlchemy 2.0 (async) · asyncpg</td>
+  </tr>
+  <tr>
+    <td>Yuz aniqlash</td>
+    <td>InsightFace SCRFD</td>
+  </tr>
+  <tr>
+    <td>Yuz tanish</td>
+    <td>InsightFace ArcFace (<code>buffalo_l</code>)</td>
+  </tr>
+  <tr>
+    <td>Inference</td>
+    <td>ONNX Runtime (CPU / GPU)</td>
+  </tr>
+  <tr>
+    <td>Tasvir ishlash</td>
+    <td>OpenCV · Pillow</td>
+  </tr>
+</table>
 
 > **Python 3.11.x** tavsiya etiladi. Python 3.12+ ba'zi CV kutubxonalari bilan muammo berishi mumkin.
 
 ---
 
-## Tez boshlash (Windows)
+## 🚀 Tez boshlash (Windows)
 
 ### 1. Talablar
 
@@ -101,29 +185,7 @@ Brauzerda oching: **http://localhost:8000**
 
 ---
 
-## Telefondan kirish
-
-1. Telefon va kompyuter **bir xil Wi-Fi** tarmog'ida bo'lsin
-2. `.\run.ps1` ishga tushiring — terminalda telefon uchun IP ko'rsatiladi
-3. Telefonda oching: `http://<PC-IP>:8000` (masalan `http://10.21.151.162:8000`)
-
-Agar ulanmasa, Administrator sifatida:
-
-```powershell
-.\setup_firewall.ps1
-```
-
-> **Eslatma:** HTTP rejimida telefon ekranida **kompyuter veb-kamerasi** jonli videosi ko'rinadi — xuddi laptopdagi kabi. Odam kompyuter kamerasi oldida turishi kerak.
-
-HTTPS rejimi (ixtiyoriy, telefonning o'z kamerasi uchun):
-
-```powershell
-.\run_https.ps1
-```
-
----
-
-## Loyiha tuzilmasi
+## 📁 Loyiha tuzilmasi
 
 ```
 FaceIdCursor/
@@ -132,43 +194,39 @@ FaceIdCursor/
 │   ├── core/             # Sozlamalar, logging
 │   ├── database/         # DB ulanish, migratsiyalar
 │   ├── enrollment/       # Talaba ro'yxatdan o'tkazish
-│   ├── models/           # SQLAlchemy modellari
 │   ├── recognition/      # Kamera, detection, embedding, matching
 │   ├── services/         # Biznes logika
 │   ├── static/           # CSS, JavaScript
 │   └── templates/        # HTML shablonlar
+├── interface_images/     # Interfeys skrinshotlari (README uchun)
 ├── face_data/
 │   ├── images/           # Yuz suratlari (gitignore)
 │   └── embeddings/       # Embedding fayllari (gitignore)
 ├── logs/                 # Ilova loglari (gitignore)
-├── scripts/              # SSL sertifikat va yordamchi skriptlar
-├── certs/                # SSL sertifikatlar (gitignore)
-├── .env.example          # Muhit o'zgaruvchilari namunasi
+├── .env.example
 ├── requirements.txt
 ├── run.ps1               # HTTP server
-├── run_https.ps1         # HTTPS server
-├── stop_servers.ps1      # Port 8000 ni tozalash
-└── setup_firewall.ps1    # Windows Firewall qoidasi
+└── stop_servers.ps1      # Port 8000 ni tozalash
 ```
 
 ---
 
-## Sozlamalar (.env)
+## ⚙️ Sozlamalar (.env)
 
 | O'zgaruvchi | Tavsif | Standart |
 |-------------|--------|----------|
-| `APP_HOST` | Server host | `0.0.0.0` (telefon uchun) |
+| `APP_HOST` | Server host | `127.0.0.1` |
 | `APP_PORT` | Port | `8000` |
 | `DATABASE_URL` | PostgreSQL ulanish | — |
-| `RECOGNITION_THRESHOLD` | Tanish chegarasi (0–1) | `0.45` |
+| `RECOGNITION_THRESHOLD` | Tanish chegarasi (0–1). Yuqori = qattiqroq | `0.45` |
 | `USE_GPU` | GPU yoqish | `False` |
-| `ATTENDANCE_COOLDOWN_SECONDS` | Qayta yozish vaqti | `30` |
+| `ATTENDANCE_COOLDOWN_SECONDS` | Qayta yozish vaqti (soniya) | `30` |
 
 Birinchi ishga tushirishda InsightFace modellari avtomatik yuklanadi (~270 MB).
 
 ---
 
-## GPU qo'llab-quvvatlash (ixtiyoriy)
+## 🎮 GPU qo'llab-quvvatlash (ixtiyoriy)
 
 NVIDIA GPU + CUDA 11.8 yoki 12.x bo'lsa:
 
@@ -183,7 +241,7 @@ GPU bo'lmasa tizim avtomatik CPU rejimida ishlaydi (~15–20 FPS).
 
 ---
 
-## API endpointlar
+## 📡 API endpointlar
 
 | Endpoint | Vazifa |
 |----------|--------|
@@ -195,13 +253,24 @@ GPU bo'lmasa tizim avtomatik CPU rejimida ishlaydi (~15–20 FPS).
 | `POST /api/enroll/capture/{id}/{angle}` | Burchakdan surat olish |
 | `GET /api/attendance/last` | Oxirgi davomat |
 
-To'liq API hujjati: `http://localhost:8000/docs` (DEBUG=True bo'lganda)
+To'liq API hujjati: `http://localhost:8000/docs` (`DEBUG=True` bo'lganda)
 
 ---
 
-## GitHub ga yuklash
+## 🔧 Muammolarni hal qilish
 
-Loyiha GitHub uchun tayyorlangan. Quyidagi buyruqlar:
+| Muammo | Yechim |
+|--------|--------|
+| Port 8000 band | `.\stop_servers.ps1` ishga tushiring |
+| Kamera ochilmaydi | Boshqa dastur kamerani band qilmaganini tekshiring |
+| Model yuklanmaydi | Internet ulanishi va ~270 MB bo'sh joy |
+| Tanish ishlamaydi | Talaba 5 burchakdan ro'yxatdan o'tkazilganini tekshiring |
+
+---
+
+## 📤 GitHub ga yuklash
+
+Loyiha GitHub uchun tayyorlangan:
 
 ```powershell
 cd C:\path\to\FaceIdCursor
@@ -211,40 +280,28 @@ git add .
 git status          # .env va face_data yuklanmasligini tekshiring
 git commit -m "Initial commit: FaceID Attendance System"
 
-# GitHub da yangi repo yarating, keyin:
 git remote add origin https://github.com/<username>/FaceIdCursor.git
 git branch -M main
 git push -u origin main
 ```
 
-### Gitignore qoidalari
-
-Quyidagilar **hech qachon** GitHub ga yuklanmaydi:
+**Gitignore** — quyidagilar hech qachon yuklanmaydi:
 
 - `.env` — parollar va maxfiy kalitlar
 - `.venv/` — virtual muhit
 - `face_data/` — yuz suratlari va embeddinglar
 - `logs/` — log fayllar
-- `certs/*.pem` — SSL sertifikatlar
 
 ---
 
-## Muammolarni hal qilish
-
-| Muammo | Yechim |
-|--------|--------|
-| Port 8000 band | `.\stop_servers.ps1` ishga tushiring |
-| Telefon ulanmaydi | Bir xil Wi-Fi, `setup_firewall.ps1`, to'g'ri IP |
-| `ERR_SSL_PROTOCOL_ERROR` | Faqat bitta server ishlayotganini tekshiring |
-| Kamera ochilmaydi | Boshqa dastur kamerani band qilmaganini tekshiring |
-| Model yuklanmaydi | Internet ulanishi va ~270 MB bo'sh joy |
-
----
-
-## Litsenziya
+## 📄 Litsenziya
 
 Shaxsiy / ta'lim loyihasi. Erkin foydalaning va o'zgartiring.
 
 ---
 
-**FaceID Attendance** — yuz tanish orqali aqlli davomat tizimi.
+<div align="center">
+
+**FaceID Attendance** — yuz tanish orqali aqlli davomat tizimi
+
+</div>

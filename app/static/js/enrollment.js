@@ -13,7 +13,6 @@
  *  4. After all 5 → generate embeddings → enable Save button
  */
 
-// --- DOM refs ---
 const studentNameInput       = document.getElementById('studentName');
 const studentCodeInput       = document.getElementById('studentCode');
 const openCameraBtn          = document.getElementById('openCameraBtn');
@@ -33,14 +32,12 @@ const successMessage         = document.getElementById('successMessage');
 const errorAlert             = document.getElementById('errorAlert');
 const errorMessage           = document.getElementById('errorMessage');
 
-// --- State ---
 let studentId       = null;
 let currentAngle    = 0;
 let totalAngles     = 5;
 let angles          = [];
 let cameraStarted   = false;
 let enrollmentMode  = null; // 'camera' | 'file'
-let flipCameraBtn   = null;
 let captureBtn      = null;
 let uploadBtn       = null;
 let isUploading     = false;
@@ -73,9 +70,6 @@ const CAPTURE_ICON = `
         <path d="M3.06 13A9 9 0 0 0 20.94 13"/>
     </svg>`;
 
-// ------------------------------------------------------------------
-// Step 1: Start enrollment
-// ------------------------------------------------------------------
 openCameraBtn.addEventListener('click', () => startEnrollment('camera'));
 uploadFromFileBtn.addEventListener('click', () => startEnrollment('file'));
 
@@ -164,9 +158,6 @@ async function startEnrollment(mode) {
     }
 }
 
-// ------------------------------------------------------------------
-// Capture workflow
-// ------------------------------------------------------------------
 function startCaptureWorkflow() {
     showAngle(currentAngle);
     insertCaptureControls();
@@ -220,7 +211,6 @@ function insertCaptureControls() {
 async function handleCapture() {
     captureBtn.disabled = true;
     if (uploadBtn) uploadBtn.disabled = true;
-    if (flipCameraBtn) flipCameraBtn.disabled = true;
     captureBtn.innerHTML = 'Capturing...';
     hideAlerts();
 
@@ -340,18 +330,12 @@ async function onEnrollmentComplete(data) {
         Save & Finish`;
 }
 
-// ------------------------------------------------------------------
-// Form submit (Save button)
-// ------------------------------------------------------------------
 enrollForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!studentId) return;
     window.location.href = '/students';
 });
 
-// ------------------------------------------------------------------
-// Preview helpers
-// ------------------------------------------------------------------
 function showCameraFeed() {
     previewPlaceholder.style.display = 'none';
     removePreviewImage();
@@ -387,7 +371,7 @@ function showSelectedFilePreview(file) {
 }
 
 function removePreviewImage(idToKeep) {
-    ['enrollFeed', 'filePreview', 'enrollClientVideo', 'clientVideo'].forEach((id) => {
+    ['enrollFeed', 'filePreview'].forEach((id) => {
         if (id === idToKeep) return;
         const img = document.getElementById(id);
         if (img) {
@@ -399,9 +383,6 @@ function removePreviewImage(idToKeep) {
     });
 }
 
-// ------------------------------------------------------------------
-// Dot progress helpers
-// ------------------------------------------------------------------
 function updateDot(index, state) {
     const dot = document.getElementById(`dot-${index}`);
     if (!dot) return;
@@ -410,9 +391,6 @@ function updateDot(index, state) {
     if (state === 'active') dot.classList.add('active');
 }
 
-// ------------------------------------------------------------------
-// Status / alert helpers
-// ------------------------------------------------------------------
 function setCaptureStatus(msg) {
     captureStatus.textContent = msg;
 }
@@ -441,7 +419,6 @@ function setStartButtonsDisabled(disabled) {
 
 function resetStartButtons() {
     enrollmentMode = null;
-    flipCameraBtn = null;
     setStartButtonsDisabled(false);
     openCameraBtn.style.display = '';
     uploadFromFileBtn.style.display = '';
@@ -453,9 +430,6 @@ function resetAngleButtons() {
     if (captureBtn) {
         captureBtn.disabled = false;
         captureBtn.innerHTML = `${CAPTURE_ICON} Capture`;
-    }
-    if (flipCameraBtn) {
-        flipCameraBtn.disabled = false;
     }
     if (uploadBtn) {
         uploadBtn.disabled = false;

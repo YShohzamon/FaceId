@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     }
 
     def get_ctx_id(self) -> int:
-        """Return ONNX Runtime context ID: 0 for GPU, -1 for CPU."""
+        """Return ONNX Runtime context ID: gpu_id when USE_GPU=True, else -1 (CPU)."""
         if self.use_gpu:
             return self.gpu_id
         return -1
@@ -60,5 +60,4 @@ class Settings(BaseSettings):
             d.mkdir(parents=True, exist_ok=True)
 
 
-# Single global instance used across the app
 settings = Settings()

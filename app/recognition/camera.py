@@ -237,7 +237,6 @@ class CameraManager:
         run at 5-15 fps on CPU, but that does NOT affect capture FPS.
         """
         from app.recognition.pipeline import process_frame
-        from app.services.embedding_service import store_is_empty
 
         while self._running:
             # Wait for embedder to be ready

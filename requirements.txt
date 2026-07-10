@@ -28,7 +28,7 @@ Pillow==10.4.0
 # --- Face Recognition ---
 # InsightFace uses ONNX Runtime under the hood.
 # For CPU-only machines: onnxruntime is used below.
-# For NVIDIA GPU (like MX450): replace onnxruntime with onnxruntime-gpu
+# For NVIDIA GPU: replace onnxruntime with onnxruntime-gpu
 # and make sure CUDA 11.8 or 12.x is installed.
 insightface==0.7.3
 onnxruntime==1.18.0

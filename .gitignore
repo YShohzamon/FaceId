@@ -43,10 +43,6 @@ face_data/images/*
 face_data/embeddings/*
 !face_data/embeddings/.gitkeep
 
-# --- SSL certificates (generated locally) ---
-certs/*
-!certs/.gitkeep
-
 # --- Database ---
 *.db
 *.sqlite3

@@ -1,46 +1,8 @@
 /**
  * Global UI utilities — clock, search filter, toast notifications,
- * mobile navigation, and dashboard auto-refresh.
+ * and dashboard auto-refresh.
  */
 
-// --- Mobile sidebar toggle --------------------------------------
-const menuToggle = document.getElementById('menuToggle');
-const sidebar = document.getElementById('sidebar');
-const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-function closeSidebar() {
-    sidebar?.classList.remove('open');
-    sidebarOverlay?.classList.remove('visible');
-    document.body.style.overflow = '';
-}
-
-function openSidebar() {
-    sidebar?.classList.add('open');
-    sidebarOverlay?.classList.add('visible');
-    document.body.style.overflow = 'hidden';
-}
-
-if (menuToggle && sidebar) {
-    menuToggle.addEventListener('click', () => {
-        if (sidebar.classList.contains('open')) {
-            closeSidebar();
-        } else {
-            openSidebar();
-        }
-    });
-}
-
-sidebarOverlay?.addEventListener('click', closeSidebar);
-
-document.querySelectorAll('.sidebar .nav-item').forEach((link) => {
-    link.addEventListener('click', () => {
-        if (window.matchMedia('(max-width: 768px)').matches) {
-            closeSidebar();
-        }
-    });
-});
-
-// --- Live clock -------------------------------------------------
 function updateClock() {
     const el = document.getElementById('current-time');
     if (!el) return;
@@ -52,7 +14,6 @@ function updateClock() {
 updateClock();
 setInterval(updateClock, 1000);
 
-// --- Student table search filter --------------------------------
 const searchInput = document.getElementById('searchInput');
 if (searchInput) {
     searchInput.addEventListener('input', () => {
@@ -63,9 +24,6 @@ if (searchInput) {
     });
 }
 
-// ================================================================
-// Toast notification system
-// ================================================================
 window.showToast = function (message, type = 'info', duration = 3500) {
     const container = document.getElementById('toast-container');
     if (!container) return;
@@ -91,10 +49,8 @@ window.showToast = function (message, type = 'info', duration = 3500) {
 
     container.appendChild(toast);
 
-    // Animate in
     requestAnimationFrame(() => toast.classList.add('toast--visible'));
 
-    // Auto-dismiss
     const timer = setTimeout(() => dismissToast(toast), duration);
     toast.addEventListener('mouseenter', () => clearTimeout(timer));
     toast.addEventListener('mouseleave', () => setTimeout(() => dismissToast(toast), 1200));
@@ -105,9 +61,6 @@ function dismissToast(toast) {
     toast.addEventListener('transitionend', () => toast.remove(), { once: true });
 }
 
-// ================================================================
-// Dashboard stats auto-refresh (every 30 s, only on home page)
-// ================================================================
 if (document.getElementById('statTotalStudents')) {
     setInterval(async () => {
         try {

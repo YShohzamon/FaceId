@@ -100,6 +100,7 @@ async def _save_angle_and_respond(
         angle_label=result["angle_label"],
     )
 
+    # Counts face_embeddings rows (image captured); .npy files come from /generate.
     angles_done = await db.scalar(
         select(func.count(FaceEmbedding.id))
         .where(FaceEmbedding.student_id == student_id)
@@ -274,9 +275,8 @@ async def generate_embeddings(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    Step 3: Generate ArcFace embeddings for all captured images of a student.
-    Called automatically after all 5 angles are captured.
-    Also reloads the in-memory embedding store so recognition works immediately.
+    Generate ArcFace embeddings for all captured images of a student.
+    Reloads the in-memory embedding store so recognition works immediately.
     """
     student = await get_student_by_id(db, student_id)
     if not student:

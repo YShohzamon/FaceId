@@ -42,9 +42,7 @@ class FaceDetector:
 
             logger.info("Loading InsightFace model (may download on first run)...")
 
-            # 'buffalo_sc' = small + fast: only SCRFD detection, no recognition yet
-            # We use 'buffalo_l' later in Phase 6 for full pipeline (det + rec)
-            # For Phase 4, we only need detection so buffalo_sc is enough.
+            # Lightweight SCRFD-only fallback when FaceEmbedder (buffalo_l) is not loaded.
             self._app = FaceAnalysis(
                 name="buffalo_sc",
                 allowed_modules=["detection"],
@@ -116,5 +114,5 @@ class FaceDetector:
         return ["CPUExecutionProvider"]
 
 
-# Singleton — loaded once and shared across all requests
+# Singleton — defaults to CPU (ctx_id=-1). Pass settings.get_ctx_id() to honor USE_GPU.
 face_detector = FaceDetector()

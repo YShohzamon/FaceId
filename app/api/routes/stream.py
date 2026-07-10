@@ -9,15 +9,12 @@ Camera stream routes.
 
 import asyncio
 import logging
-import numpy as np
-import cv2
-from fastapi import APIRouter, Depends, Response, File, UploadFile, HTTPException
+from fastapi import APIRouter, Depends, Response
 from fastapi.responses import StreamingResponse, JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.recognition.camera import camera_manager
 from app.recognition.embedder import face_embedder
-from app.recognition.pipeline import process_frame
 from app.database.connection import get_db
 from app.services.attendance_service import log_attendance, is_on_cooldown
 from app.core.config import settings
@@ -27,13 +24,6 @@ logger = logging.getLogger(__name__)
 
 _BOUNDARY = b"frame"
 _CONTENT_TYPE = f"multipart/x-mixed-replace; boundary={_BOUNDARY.decode()}"
-MAX_FRAME_BYTES = 10 * 1024 * 1024
-ALLOWED_FRAME_TYPES = {
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-    "image/bmp",
-}
 
 
 async def _ensure_embedder_loaded() -> bool:
@@ -70,6 +60,7 @@ async def _apply_attendance(
                 confidence=result.get("confidence", 0.0),
             )
             if not attendance_logged and is_on_cooldown(student_id):
+                # Private import: compute remaining cooldown without a DB query.
                 from app.services.attendance_service import _cooldown
                 from datetime import datetime, timezone
 
@@ -111,74 +102,6 @@ async def start_camera():
     return {"status": "started", "embedder_ready": face_embedder.is_ready}
 
 
-@router.post("/prepare")
-async def prepare_recognition():
-    """
-    Load the AI model without starting the server webcam.
-    Used when the browser captures frames from the phone camera.
-    """
-    embedder_ready = await _ensure_embedder_loaded()
-    if not embedder_ready:
-        raise HTTPException(
-            status_code=503,
-            detail="ArcFace model failed to load. Check server logs.",
-        )
-
-    return {
-        "status": "ready",
-        "embedder_ready": True,
-        "mode": "client",
-    }
-
-
-@router.post("/recognize-frame")
-async def recognize_frame(
-    file: UploadFile = File(...),
-    db: AsyncSession = Depends(get_db),
-):
-    """
-    Run recognition on a single frame uploaded from a client device camera.
-    Used by mobile browsers that send phone camera frames to the server.
-    """
-    if file.content_type not in ALLOWED_FRAME_TYPES:
-        raise HTTPException(
-            status_code=422,
-            detail="Unsupported image type. Use JPG, PNG, WEBP, or BMP.",
-        )
-
-    file_bytes = await file.read()
-    if not file_bytes:
-        raise HTTPException(status_code=422, detail="Empty image.")
-    if len(file_bytes) > MAX_FRAME_BYTES:
-        raise HTTPException(status_code=422, detail="Image too large (max 10 MB).")
-
-    embedder_ready = await _ensure_embedder_loaded()
-    if not embedder_ready:
-        raise HTTPException(status_code=503, detail="AI model is not ready.")
-
-    arr = np.frombuffer(file_bytes, dtype=np.uint8)
-    frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
-    if frame is None:
-        raise HTTPException(status_code=422, detail="Could not decode image.")
-
-    _, result = await asyncio.to_thread(process_frame, frame, face_embedder, 0.0)
-    attendance_logged, cooldown_remaining = await _apply_attendance(db, result)
-
-    return {
-        "running": True,
-        "mode": "client",
-        "fps": 0,
-        "embedder_ready": True,
-        "face_detected": result["face_detected"],
-        "label": result["label"],
-        "confidence": round(result["confidence"], 3),
-        "state": result["state"],
-        "bbox": result.get("bbox", []),
-        "attendance_logged": attendance_logged,
-        "cooldown_remaining": cooldown_remaining,
-    }
-
-
 @router.post("/stop")
 async def stop_camera():
     """Stop the webcam capture thread."""
@@ -191,7 +114,8 @@ async def camera_status(db: AsyncSession = Depends(get_db)):
     """
     Return camera state, FPS, and latest recognition result.
     Also triggers attendance logging when a known student is detected.
-    Called every 500 ms by the frontend — this is the attendance write point.
+    Polled every 500 ms by the frontend. Cooldown is enforced in memory
+    before writing to the database.
     """
     det = camera_manager.get_detection_result()
 
@@ -205,7 +129,6 @@ async def camera_status(db: AsyncSession = Depends(get_db)):
 
     return {
         "running": camera_manager.is_running,
-        "mode": "server",
         "fps": camera_manager.fps,
         "embedder_ready": face_embedder.is_ready,
         "face_detected": det.face_detected,
@@ -230,9 +153,9 @@ async def _mjpeg_generator():
     """
     Async generator yielding annotated MJPEG frames.
 
-    Targets ~30 fps by sleeping 20ms between frames.
-    The capture thread runs at native camera speed; we just serve
-    whatever the latest frame is as fast as the browser can receive it.
+    Poll interval ~20 ms (~50 fps cap for the MJPEG consumer loop).
+    The capture thread runs at native camera speed; this loop serves
+    the latest annotated frame to the browser.
     """
     camera_manager.add_consumer()
     last_frame: bytes | None = None
@@ -247,7 +170,7 @@ async def _mjpeg_generator():
                     b"Content-Type: image/jpeg\r\n\r\n"
                     + frame + b"\r\n"
                 )
-            await asyncio.sleep(0.020)   # 50 fps ceiling — browser limits anyway
+            await asyncio.sleep(0.020)
     except asyncio.CancelledError:
         pass
     finally:

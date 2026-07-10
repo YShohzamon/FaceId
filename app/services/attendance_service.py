@@ -39,10 +39,7 @@ def update_cooldown(student_id: int) -> None:
 
 
 def reset_cooldown(student_id: int | None = None) -> None:
-    """
-    Clear cooldown for one student or all students.
-    Used in testing or when the camera is stopped.
-    """
+    """Clear cooldown for one student or all students. Used in tests."""
     if student_id is not None:
         _cooldown.pop(student_id, None)
     else:

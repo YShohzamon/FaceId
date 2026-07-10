@@ -3,14 +3,13 @@ ArcFace face embedder.
 
 Generates a 512-dimensional embedding vector from an aligned face image.
 Uses InsightFace's buffalo_l model which includes both:
-  - SCRFD (detection)  — reused from FaceDetector
-  - ArcFace (recognition) — used here for embeddings
+  - SCRFD (detection)
+  - ArcFace (recognition)
 
 Design:
-  - FaceEmbedder loads the FULL buffalo_l model (detection + recognition).
-  - For embedding generation we pass an already-detected face (aligned crop).
-  - For recognition pipeline (Phase 7) we pass a full frame and get both
-    detection + embedding in one call.
+  - FaceEmbedder loads the full buffalo_l model (detection + recognition).
+  - embed_image_file() reads a saved image and extracts one embedding.
+  - embed_frame() runs detection + embedding on a live BGR frame.
 
 Embedding storage:
   - Each embedding is saved as a .npy file (512 float32 values, ~2 KB).
@@ -81,7 +80,7 @@ class FaceEmbedder:
         """
         Run full detection + embedding on a raw BGR frame.
         Returns (embedding, face) or (None, None).
-        Used in Phase 7 for real-time recognition.
+        Used by the recognition pipeline (process_frame / camera thread).
         """
         if not self._ready or self._app is None:
             return None, None
@@ -172,5 +171,5 @@ class FaceEmbedder:
         return self._ready
 
 
-# Singleton
+# Singleton — defaults to CPU (ctx_id=-1). Pass settings.get_ctx_id() to honor USE_GPU.
 face_embedder = FaceEmbedder()

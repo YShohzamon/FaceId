@@ -6,11 +6,9 @@
 {% block content %}
 <div class="recognition-layout">
 
-    <!-- Camera Feed -->
     <div class="camera-card">
         <div class="camera-container" id="cameraContainer">
 
-            <!-- Placeholder shown before camera starts -->
             <div class="camera-placeholder" id="cameraPlaceholder">
                 <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <rect x="2" y="3" width="20" height="14" rx="2"/>
@@ -20,7 +18,6 @@
                 <p id="placeholderText">Press <strong>Start Camera</strong> to begin</p>
             </div>
 
-            <!-- MJPEG live stream — hidden until camera starts -->
             <img
                 id="videoFeed"
                 src=""
@@ -28,25 +25,9 @@
                 style="display:none; width:100%; height:100%; object-fit:cover;"
             />
 
-            <!-- Corner-lines bounding box overlay (drawn over the img) -->
-            <canvas id="overlayCanvas" style="
-                position:absolute; top:0; left:0;
-                width:100%; height:100%;
-                pointer-events:none;
-            "></canvas>
-
-            <!-- FPS counter -->
             <div class="fps-overlay" id="fpsOverlay">
                 <span id="fpsValue">-- FPS</span>
             </div>
-
-            <!-- Flip camera (mobile) -->
-            <button type="button" class="flip-camera-btn" id="flipCameraBtn" style="display:none;" title="Switch camera">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
-                </svg>
-                <span>Front Camera</span>
-            </button>
         </div>
 
         <div class="camera-controls">
@@ -65,7 +46,6 @@
         </div>
     </div>
 
-    <!-- Recognition Info Panel -->
     <div class="recognition-panel">
 
         <div class="recognition-result" id="recognitionResult">

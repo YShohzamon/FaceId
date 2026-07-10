@@ -11,44 +11,10 @@
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
         </svg>
         <h2>Settings</h2>
-        <p>This page is a placeholder. Settings configuration will be available in a future phase.</p>
+        <p>Settings editing is not implemented yet. Values below are loaded from <code>.env</code>.</p>
 
         <div class="settings-info">
-            <h3>Phone Connection</h3>
-            {% if phone_urls %}
-            <div class="config-list">
-                {% for url in phone_urls %}
-                <div class="config-row">
-                    <span class="config-key">Open on phone</span>
-                    <span class="config-value"><a href="{{ url }}" style="color:var(--accent);">{{ url }}</a></span>
-                </div>
-                {% endfor %}
-            </div>
-            <p class="config-note">
-                Phone and PC must be on the <strong>same Wi-Fi</strong> (not mobile data).
-                Open <strong>http://</strong> address — no SSL certificate needed.
-            </p>
-            {% else %}
-            <p class="config-note">Wi-Fi IP not detected. Run <code>ipconfig</code> and use your IPv4 address.</p>
-            {% endif %}
-
-            <h3 style="margin-top:24px;">If phone cannot connect</h3>
-            <div class="config-list">
-                <div class="config-row">
-                    <span class="config-key">Step 1</span>
-                    <span class="config-value">Run <code>.\stop_servers.ps1</code></span>
-                </div>
-                <div class="config-row">
-                    <span class="config-key">Step 2</span>
-                    <span class="config-value">Run <code>.\run.ps1</code></span>
-                </div>
-                <div class="config-row">
-                    <span class="config-key">Step 3</span>
-                    <span class="config-value">Run <code>.\setup_firewall.ps1</code> as Administrator</span>
-                </div>
-            </div>
-
-            <h3 style="margin-top:24px;">Current Configuration</h3>
+            <h3>Current Configuration</h3>
             <div class="config-list">
                 <div class="config-row">
                     <span class="config-key">Recognition Threshold</span>
@@ -67,16 +33,12 @@
                     <span class="config-value">{{ config.log_level }}</span>
                 </div>
                 <div class="config-row">
-                    <span class="config-key">Server Host</span>
+                    <span class="config-key">Server</span>
                     <span class="config-value">{{ config.app_host }}:{{ config.app_port }}</span>
-                </div>
-                <div class="config-row">
-                    <span class="config-key">Mobile Access</span>
-                    <span class="config-value">http://&lt;PC-IP&gt;:8000</span>
                 </div>
             </div>
             <p class="config-note">
-                Start server with <code>.\run.ps1</code>. Phone camera uses photo capture (no HTTPS required).
+                Start the server with <code>.\run.ps1</code> and open <code>http://localhost:8000</code>.
             </p>
         </div>
     </div>

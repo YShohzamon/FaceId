@@ -19,7 +19,6 @@ from app.services.embedding_service import load_all_embeddings
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Run startup and shutdown tasks."""
-    # Startup
     setup_logging()
     settings.ensure_directories()
     logger = logging.getLogger(__name__)
@@ -33,9 +32,9 @@ async def lifespan(app: FastAPI):
         count = await load_all_embeddings(db)
         logger.info(f"Loaded {count} face embeddings into memory.")
 
-    yield  # Application runs here
+    yield
 
-    # Shutdown — stop camera if it was left running
+    # Stop camera if it was left running
     if camera_manager.is_running:
         camera_manager.stop()
     await close_db()
@@ -51,10 +50,8 @@ app = FastAPI(
     redoc_url=None,
 )
 
-# Serve static files (CSS, JS, images)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-# Register routers
 app.include_router(pages.router)
 app.include_router(students.router)
 app.include_router(attendance.router)

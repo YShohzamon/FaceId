@@ -1,10 +1,9 @@
 /**
- * Recognition page — live MJPEG stream + recognition (same on phone and laptop).
+ * Recognition page — live MJPEG stream from server webcam + status polling.
  */
 
 const startBtn           = document.getElementById('startBtn');
 const stopBtn            = document.getElementById('stopBtn');
-const flipCameraBtn      = document.getElementById('flipCameraBtn');
 const videoFeed          = document.getElementById('videoFeed');
 const placeholder        = document.getElementById('cameraPlaceholder');
 const fpsValue           = document.getElementById('fpsValue');
@@ -18,9 +17,6 @@ const lastAttendanceText = document.getElementById('lastAttendanceText');
 
 let statusPollInterval = null;
 
-// ------------------------------------------------------------------
-// Start camera — server live video stream
-// ------------------------------------------------------------------
 startBtn.addEventListener('click', async () => {
     startBtn.disabled = true;
     startBtn.innerHTML = 'Loading model...';
@@ -51,7 +47,6 @@ async function startServerCamera() {
     videoFeed.src = '/api/stream/feed';
     videoFeed.style.display = 'block';
     placeholder.style.display = 'none';
-    if (flipCameraBtn) flipCameraBtn.style.display = 'none';
 
     startBtn.disabled = true;
     stopBtn.disabled = false;
@@ -61,9 +56,6 @@ async function startServerCamera() {
     fetchLastAttendance();
 }
 
-// ------------------------------------------------------------------
-// Stop camera
-// ------------------------------------------------------------------
 stopBtn.addEventListener('click', async () => {
     stopBtn.disabled = true;
 
@@ -82,9 +74,6 @@ stopBtn.addEventListener('click', async () => {
     resetStartBtn();
 });
 
-// ------------------------------------------------------------------
-// Poll /api/stream/status for live recognition
-// ------------------------------------------------------------------
 function startStatusPolling() {
     statusPollInterval = setInterval(async () => {
         try {
@@ -147,9 +136,6 @@ function handleCameraStopped() {
     fpsValue.textContent = '-- FPS';
 }
 
-// ------------------------------------------------------------------
-// Attendance helpers
-// ------------------------------------------------------------------
 async function fetchLastAttendance() {
     try {
         const res = await fetch('/api/attendance/last');
@@ -180,9 +166,6 @@ function showCooldown(name, seconds) {
     lastAttendanceText.textContent = `${name} — cooldown: ${seconds}s remaining`;
 }
 
-// ------------------------------------------------------------------
-// UI helpers
-// ------------------------------------------------------------------
 function setCameraStatus(online) {
     cameraStatus.textContent = online ? 'Online' : 'Offline';
     cameraStatus.className = online
